@@ -1,0 +1,13 @@
+{
+  "_note": "전기차 보조금 메타. 가격 구간·청년 추가지원은 2026년 지침(기후에너지환경부 2026.1.13 공고) 확인. 지역×모델 금액은 data/ev_subsidy_rows.csv 참조 — 표의 국비·지방비는 가격 구간이 이미 반영된 확정액이다.",
+  "effectiveLabel": "2026년 기준",
+  "updatedAt": "2026.08",
+  "youthBonusRate": 0.2,
+  "roundingUnit": 10000,
+  "priceExclusionThreshold": 85000000,
+  "acquisitionTaxRate": 0.07,
+  "acquisitionTaxReliefCap": 1400000,
+  "acquisitionTaxAfterSubsidy": true,
+  "individualConsumptionReliefCap": 3000000,
+  "educationTaxReliefCap": 900000
+}
