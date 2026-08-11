@@ -6,8 +6,8 @@ JSON을 직접 고치지 말고 이 폴더의 파일을 고칠 것 — 검증 �
 
 ```
 data/ev_subsidy_meta.json     ─┐
-data/ev_subsidy_models.csv     ├─► tool/build_ev_subsidy.py ─► assets/ev_subsidy_table.json
-data/ev_subsidy_regions.csv   ─┘        (GitHub Actions)              │
+                               ├─► tool/build_ev_subsidy.py ─► assets/ev_subsidy_table.json
+data/ev_subsidy_rows.csv      ─┘        (GitHub Actions)              │
                                                                       ▼
                                                     앱이 실행할 때마다 원격에서 읽음
 ```

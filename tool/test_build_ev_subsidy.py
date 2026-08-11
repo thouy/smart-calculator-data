@@ -45,18 +45,29 @@ def meta(**over) -> dict:
     m = {
         "effectiveLabel": "2026년 기준",
         "updatedAt": "2026.02",
-        "priceTiers": [
-            {"limit": 53000000, "rate": 1.0},
-            {"limit": 85000000, "rate": 0.5},
-            {"limit": None, "rate": 0.0},
-        ],
+        "youthBonusRate": 0.2,
     }
     m.update(over)
     return m
 
 
+def row(**over) -> dict:
+    r = {
+        "region": "서울특별시",
+        "maker": "기아",
+        "model": "EV3 GT",
+        "national": "2480000",
+        "local": "740000",
+        "convNational": "500000",
+        "convLocal": "150000",
+    }
+    r.update(over)
+    return r
+
+
 def main() -> int:
     b._force_utf8_output()
+
     print("meta 검증")
     expect_ok("정상 meta", lambda: b.validate_meta(meta(), today=TODAY))
     expect_error(
@@ -76,79 +87,78 @@ def main() -> int:
         contains="YYYY.MM",
     )
     expect_error(
-        "priceTiers 마지막 칸 limit이 null이 아니면 거부",
-        lambda: b.validate_meta(
-            meta(priceTiers=[{"limit": 53000000, "rate": 1.0}]), today=TODAY),
-        contains="null",
-    )
-    expect_error(
-        "priceTiers rate 오름차순이면 거부",
-        lambda: b.validate_meta(meta(priceTiers=[
-            {"limit": 53000000, "rate": 0.5},
-            {"limit": None, "rate": 1.0},
-        ]), today=TODAY),
-        contains="내림차순",
+        "youthBonusRate 범위 밖 거부",
+        lambda: b.validate_meta(meta(youthBonusRate=1.5), today=TODAY),
+        contains="0~1",
     )
 
-    print("models 검증")
-    expect_ok(
-        "정상 행",
-        lambda: b.parse_models([{"name": "기아 EV3", "nationalBase": "4700000"}]),
-    )
+    print("rows 검증")
+    expect_ok("정상 행", lambda: b.parse_rows_from([row()]))
     expect_ok(
         "천단위 쉼표·'원' 허용",
-        lambda: b.parse_models([{"name": "A", "nationalBase": "4,700,000원"}]),
+        lambda: b.parse_rows_from([row(national="2,480,000원")]),
+    )
+    expect_ok(
+        "전환지원금은 비어 있어도 된다(승합은 해당 열이 없다)",
+        lambda: b.parse_rows_from([row(convNational="", convLocal="")]),
+    )
+    expect_error(
+        "필수 컬럼 누락 거부",
+        lambda: b.parse_rows_from([{"region": "서울특별시", "model": "EV3"}]),
+        contains="필수 컬럼 누락",
+    )
+    expect_error(
+        "빈 목록 거부",
+        lambda: b.parse_rows_from([]),
+        contains="데이터 행이 없습니다",
     )
     expect_error(
         "국비 자릿수 오타(상한 초과) 거부",
-        lambda: b.parse_models([{"name": "A", "nationalBase": "50000000"}]),
+        lambda: b.parse_rows_from([row(national="50000000")]),
         contains="자릿수",
     )
     expect_error(
         "국비 0 거부",
-        lambda: b.parse_models([{"name": "A", "nationalBase": "0"}]),
-        contains="0입니다",
+        lambda: b.parse_rows_from([row(national="0")]),
+        contains="국비가 0",
     )
     expect_error(
-        "차종명 중복 거부",
-        lambda: b.parse_models([
-            {"name": "A", "nationalBase": "4000000"},
-            {"name": "A", "nationalBase": "4100000"},
-        ]),
+        "지방비 자릿수 오타 거부",
+        lambda: b.parse_rows_from([row(local="99000000")]),
+        contains="상한",
+    )
+    expect_error(
+        "같은 지역·같은 모델 중복 거부",
+        lambda: b.parse_rows_from([row(), row()]),
         contains="중복",
     )
+    expect_ok(
+        "지역이 다르면 같은 모델이어도 통과",
+        lambda: b.parse_rows_from([row(), row(region="부산광역시", local="1040000")]),
+    )
     expect_error(
-        "판매가가 국비보다 작으면 열 밀림으로 보고 거부",
-        lambda: b.parse_models(
-            [{"name": "A", "nationalBase": "4700000", "price": "4200000"}]),
-        contains="열이 밀리",
+        "지역명이 비면 거부",
+        lambda: b.parse_rows_from([row(region="")]),
+        contains="비어 있습니다",
     )
     expect_error(
         "숫자가 아니면 거부",
-        lambda: b.parse_models([{"name": "A", "nationalBase": "사백칠십만"}]),
+        lambda: b.parse_rows_from([row(national="이백사십팔만")]),
         contains="숫자가 아닙니다",
     )
-
-    print("regions 검증")
-    expect_ok("정상 행", lambda: b.parse_regions([{"name": "서울", "local": "1800000"}]))
     expect_error(
-        "지방비 자릿수 오타 거부",
-        lambda: b.parse_regions([{"name": "서울", "local": "18000000"}]),
-        contains="자릿수",
-    )
-    expect_error(
-        "지역명 중복 거부",
-        lambda: b.parse_regions([
-            {"name": "서울", "local": "1800000"},
-            {"name": "서울", "local": "1900000"},
-        ]),
-        contains="중복",
+        "음수 거부",
+        lambda: b.parse_rows_from([row(local="-100")]),
+        contains="음수",
     )
 
     print("급변(drift) 검사")
-    prev = {"models": [{"name": "A", "nationalBase": 5000000}], "regions": []}
-    same = {"models": [{"name": "A", "nationalBase": 5200000}], "regions": []}
-    shifted = {"models": [{"name": "A", "nationalBase": 52000000}], "regions": []}
+    prev = {"rows": [{"region": "서울특별시", "maker": "기아", "model": "EV3 GT",
+                     "national": 2480000, "local": 740000}]}
+    same = [{"region": "서울특별시", "maker": "기아", "model": "EV3 GT",
+             "national": 2600000, "local": 780000}]
+    shifted = [{"region": "서울특별시", "maker": "기아", "model": "EV3 GT",
+                "national": 24800000, "local": 740000}]
     if b.check_drift(same, prev):
         _failures.append("소폭 변동인데 급변으로 잡힘")
     else:
@@ -161,6 +171,11 @@ def main() -> int:
         _failures.append("이전 표가 없으면 비교하지 말아야 함")
     else:
         print("  ok   이전 표 없으면 비교 안 함")
+    if b.check_drift([{"region": "부산광역시", "maker": "기아", "model": "EV3 GT",
+                       "national": 24800000, "local": 0}], prev):
+        _failures.append("이전 표에 없던 (지역,모델)은 비교 대상이 아니다")
+    else:
+        print("  ok   새로 추가된 행은 급변 비교에서 제외")
 
     print()
     if _failures:

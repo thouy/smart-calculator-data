@@ -61,10 +61,15 @@ def _money(value: str, *, where: str, field: str, allow_zero: bool = True) -> fl
 
 
 def parse_rows() -> list[dict]:
+    """CSV 파일을 읽어 [parse_rows_from]에 넘긴다."""
     if not os.path.exists(ROWS):
         raise BuildError(f"입력 파일이 없습니다: {os.path.relpath(ROWS, ROOT)}")
     with open(ROWS, encoding="utf-8-sig", newline="") as f:
-        raw = list(csv.DictReader(f))
+        return parse_rows_from(list(csv.DictReader(f)))
+
+
+def parse_rows_from(raw: list[dict]) -> list[dict]:
+    """파싱·검증 본체. 파일과 분리해 두어 자체 테스트가 값을 직접 넣을 수 있다."""
     if not raw:
         raise BuildError("ev_subsidy_rows.csv: 데이터 행이 없습니다.")
     missing = [c for c in REQUIRED if c not in raw[0]]

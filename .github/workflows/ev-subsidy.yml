@@ -7,9 +7,9 @@ on:
   push:
     paths:
       - 'data/ev_subsidy_meta.json'
-      - 'data/ev_subsidy_models.csv'
-      - 'data/ev_subsidy_regions.csv'
+      - 'data/ev_subsidy_rows.csv'
       - 'tool/build_ev_subsidy.py'
+      - 'tool/test_build_ev_subsidy.py'
   pull_request:
     paths:
       - 'data/ev_subsidy_**'
@@ -45,11 +45,11 @@ jobs:
       - name: 입력 파일 존재 확인
         id: inputs
         run: |
-          if [ -f data/ev_subsidy_meta.json ] && [ -f data/ev_subsidy_models.csv ] && [ -f data/ev_subsidy_regions.csv ]; then
+          if [ -f data/ev_subsidy_meta.json ] && [ -f data/ev_subsidy_rows.csv ]; then
             echo "present=true" >> "$GITHUB_OUTPUT"
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::data/ 아래 공고 파일이 아직 없습니다. 템플릿(.example)을 복사해 채우면 이 워크플로가 표를 만듭니다."
+            echo "::notice::data/ev_subsidy_meta.json 과 data/ev_subsidy_rows.csv 가 있어야 표를 만듭니다. rows.csv는 tool/extract_ev_pdf.py 로 생성합니다."
           fi
 
       - name: 표 빌드 (검증 포함)
