@@ -1,0 +1,12 @@
+{
+  "effectiveLabel": "2026년 기준",
+  "updatedAt": "2026.06",
+  "basicDeduction": 2500000,
+  "taxRate": 0.20,
+  "localTaxRate": 0.10,
+  "domesticSmallBizRate": 0.10,
+  "domesticBasicRate": 0.20,
+  "domesticHighRate": 0.25,
+  "domesticHighThreshold": 300000000,
+  "domesticShortRate": 0.30
+}

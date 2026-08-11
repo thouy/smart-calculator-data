@@ -1,0 +1,20 @@
+{
+  "effectiveLabel": "2026년 기준",
+  "updatedAt": "2026.02",
+
+  "priceTiers": [
+    { "limit": 53000000, "rate": 1.0 },
+    { "limit": 85000000, "rate": 0.5 },
+    { "limit": null, "rate": 0.0 }
+  ],
+
+  "youthBonusRate": 0.2,
+  "multiChildBonus": { "2": 1000000, "3": 2000000, "4": 3000000 },
+  "roundingUnit": 10000,
+
+  "acquisitionTaxRate": 0.07,
+  "acquisitionTaxReliefCap": 1400000,
+  "acquisitionTaxAfterSubsidy": true,
+  "individualConsumptionReliefCap": 3000000,
+  "educationTaxReliefCap": 900000
+}

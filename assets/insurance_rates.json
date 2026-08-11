@@ -1,0 +1,28 @@
+{
+  "byYear": {
+    "2024": {
+      "pensionRate": 0.045,
+      "pensionBaseMin": 390000,
+      "pensionBaseMax": 6170000,
+      "healthRate": 0.03545,
+      "longTermCareRate": 0.1295,
+      "employmentRate": 0.009
+    },
+    "2025": {
+      "pensionRate": 0.045,
+      "pensionBaseMin": 390000,
+      "pensionBaseMax": 6370000,
+      "healthRate": 0.03545,
+      "longTermCareRate": 0.1295,
+      "employmentRate": 0.009
+    },
+    "2026": {
+      "pensionRate": 0.0475,
+      "pensionBaseMin": 390000,
+      "pensionBaseMax": 6370000,
+      "healthRate": 0.03545,
+      "longTermCareRate": 0.1295,
+      "employmentRate": 0.009
+    }
+  }
+}

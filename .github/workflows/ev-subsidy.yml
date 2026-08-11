@@ -1,0 +1,73 @@
+name: 전기차 보조금 표 빌드
+
+# 사람이 data/ 아래 공고 CSV를 올리면, 검증을 통과할 때만
+# assets/ev_subsidy_table.json을 갱신해 커밋한다.
+# 앱은 실행할 때마다 그 JSON을 원격에서 읽으므로, 여기까지 오면 배포는 끝이다.
+on:
+  push:
+    paths:
+      - 'data/ev_subsidy_meta.json'
+      - 'data/ev_subsidy_models.csv'
+      - 'data/ev_subsidy_regions.csv'
+      - 'tool/build_ev_subsidy.py'
+  pull_request:
+    paths:
+      - 'data/ev_subsidy_**'
+      - 'tool/build_ev_subsidy.py'
+  workflow_dispatch:
+    inputs:
+      allow_drift:
+        description: '이전 표 대비 ±50% 급변을 허용 (요율이 실제로 크게 바뀐 해)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # 검증 실패 메시지가 한글이라 CI 로그 인코딩을 UTF-8로 고정한다.
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 검증 게이트 자체가 망가지면 오타가 그대로 통과하므로 빌더보다 먼저 돌린다.
+      - name: 검증 규칙 자체 테스트
+        working-directory: tool
+        run: python test_build_ev_subsidy.py
+
+      - name: 입력 파일 존재 확인
+        id: inputs
+        run: |
+          if [ -f data/ev_subsidy_meta.json ] && [ -f data/ev_subsidy_models.csv ] && [ -f data/ev_subsidy_regions.csv ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::data/ 아래 공고 파일이 아직 없습니다. 템플릿(.example)을 복사해 채우면 이 워크플로가 표를 만듭니다."
+          fi
+
+      - name: 표 빌드 (검증 포함)
+        if: steps.inputs.outputs.present == 'true'
+        run: |
+          python tool/build_ev_subsidy.py \
+            ${{ (github.event_name == 'workflow_dispatch' && inputs.allow_drift) && '--allow-drift' || '' }}
+
+      # PR에서는 검증 결과만 보고 커밋하지 않는다.
+      - name: 변경분 커밋
+        if: steps.inputs.outputs.present == 'true' && github.event_name != 'pull_request'
+        run: |
+          if git diff --quiet -- assets/ev_subsidy_table.json; then
+            echo "변경 없음 — 커밋 생략"
+            exit 0
+          fi
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add assets/ev_subsidy_table.json
+          git commit -m 'chore: 전기차 보조금 표 갱신 (자동 빌드)'
+          git push

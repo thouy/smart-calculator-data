@@ -1,0 +1,55 @@
+{
+  "_note": "전기차 구매보조금 표. 아래 금액은 구조 확인용 임시값이므로, 배포 전 환경부 무공해차 통합누리집(ev.or.kr) 차종별 공고와 각 지자체 공고값으로 반드시 교체할 것. 교체 시 effectiveLabel에서 '임시값' 문구를 지우고 updatedAt을 갱신한다. 지방비(regions.local)는 광역 대표값이며, 실제로는 시·군·구 단위로 다르다.",
+  "effectiveLabel": "2026년 기준(임시값 · 공고 확인 필요)",
+  "updatedAt": "—",
+
+  "priceTiers": [
+    { "limit": 53000000, "rate": 1.0 },
+    { "limit": 85000000, "rate": 0.5 },
+    { "limit": null, "rate": 0.0 }
+  ],
+
+  "youthBonusRate": 0.2,
+  "multiChildBonus": { "2": 1000000, "3": 2000000, "4": 3000000 },
+  "roundingUnit": 10000,
+
+  "acquisitionTaxRate": 0.07,
+  "acquisitionTaxReliefCap": 1400000,
+  "acquisitionTaxAfterSubsidy": true,
+  "individualConsumptionReliefCap": 3000000,
+  "educationTaxReliefCap": 900000,
+
+  "models": [
+    { "name": "직접 입력", "nationalBase": 0 },
+    { "name": "현대 아이오닉 5", "nationalBase": 5000000, "price": 52000000 },
+    { "name": "현대 아이오닉 6", "nationalBase": 5200000, "price": 51000000 },
+    { "name": "현대 코나 일렉트릭", "nationalBase": 4600000, "price": 47000000 },
+    { "name": "기아 EV6", "nationalBase": 5000000, "price": 54000000 },
+    { "name": "기아 EV3", "nationalBase": 4700000, "price": 42000000 },
+    { "name": "기아 니로 EV", "nationalBase": 4500000, "price": 45000000 },
+    { "name": "KG모빌리티 토레스 EVX", "nationalBase": 4000000, "price": 46000000 },
+    { "name": "테슬라 모델 Y", "nationalBase": 2000000, "price": 59000000 },
+    { "name": "테슬라 모델 3", "nationalBase": 2200000, "price": 55000000 }
+  ],
+
+  "regions": [
+    { "name": "직접 입력", "local": 0 },
+    { "name": "서울특별시", "local": 1800000 },
+    { "name": "부산광역시", "local": 3000000 },
+    { "name": "대구광역시", "local": 3000000 },
+    { "name": "인천광역시", "local": 3200000 },
+    { "name": "광주광역시", "local": 3200000 },
+    { "name": "대전광역시", "local": 3000000 },
+    { "name": "울산광역시", "local": 3400000 },
+    { "name": "세종특별자치시", "local": 3000000 },
+    { "name": "경기도", "local": 3000000 },
+    { "name": "강원특별자치도", "local": 3400000 },
+    { "name": "충청북도", "local": 4000000 },
+    { "name": "충청남도", "local": 4000000 },
+    { "name": "전북특별자치도", "local": 4000000 },
+    { "name": "전라남도", "local": 4200000 },
+    { "name": "경상북도", "local": 4000000 },
+    { "name": "경상남도", "local": 3700000 },
+    { "name": "제주특별자치도", "local": 3000000 }
+  ]
+}
